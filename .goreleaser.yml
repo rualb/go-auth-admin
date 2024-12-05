@@ -1,9 +1,9 @@
-project_name: go-auth
+project_name: go-auth-admin
 before:
   hooks:
     - go mod tidy
 builds:
-  - main: ./cmd/go-auth
+  - main: ./cmd/go-auth-admin
     ldflags:
       - -s -w
       - -X main.Version={{.Version}}
