@@ -20,12 +20,11 @@ type VaultKey struct {
 	ID        string `gorm:"size:255;primaryKey"`
 	CreatedAt time.Time
 	AuthKey   string `gorm:"size:255"` // base64 for auth
-	OtpKey    string `gorm:"size:255"` // base64 otp
-	HashKey   string `gorm:"size:255"` // base64 key for signup and password changing
+
 }
 
 func (x VaultKey) IsEmpty() bool {
-	return x.ID == "" || x.AuthKey == "" || x.OtpKey == "" || x.HashKey == ""
+	return x.ID == "" || x.AuthKey == ""
 }
 
 func (x *VaultKey) fill() (err error) {
@@ -35,12 +34,7 @@ func (x *VaultKey) fill() (err error) {
 	if x.AuthKey, err = utilcrypto.RandomCryptoBase64(secretKeySize); err != nil {
 		return fmt.Errorf("error on RandomCryptoArray: %v", err)
 	}
-	if x.OtpKey, err = utilcrypto.RandomCryptoBase64(secretKeySize); err != nil {
-		return fmt.Errorf("error on RandomCryptoArray: %v", err)
-	}
-	if x.HashKey, err = utilcrypto.RandomCryptoBase64(secretKeySize); err != nil {
-		return fmt.Errorf("error on RandomCryptoArray: %v", err)
-	}
+
 	return nil
 }
 
@@ -57,8 +51,6 @@ type VaultService interface {
 	KeyByID(id string) (secret *SecretKey, err error)
 
 	KeyScopeAuth() VaultKeyScope
-	KeyScopeOtp() VaultKeyScope
-	KeyScopeHash() VaultKeyScope
 
 	// Append(secret ...SecretKey)
 }
@@ -74,19 +66,6 @@ func (x *defaultVaultService) KeyScopeAuth() VaultKeyScope {
 	}
 }
 
-func (x *defaultVaultService) KeyScopeOtp() VaultKeyScope {
-	return &vaultKeyScope{
-		vaultService: x,
-		otp:          true,
-	}
-}
-func (x *defaultVaultService) KeyScopeHash() VaultKeyScope {
-	return &vaultKeyScope{
-		vaultService: x,
-		hash:         true,
-	}
-}
-
 type VaultKeyScope interface {
 	CurrentKey() (id string, secret []byte, err error)
 	KeyByID(id string) (secret []byte, err error)
@@ -95,36 +74,14 @@ type VaultKeyScope interface {
 type vaultKeyScope struct {
 	vaultService VaultService
 	auth         bool
-	otp          bool
-	hash         bool
 }
 
 func (x vaultKeyScope) extractSecret(secret *SecretKey) ([]byte, error) {
-	switch {
-	case x.auth:
+	if x.auth {
 		return secret.AuthKey, nil
-	case x.otp:
-		return secret.OtpKey, nil
-	case x.hash:
-		return secret.HashKey, nil
 	}
 	return nil, fmt.Errorf("error set secret key type for extract")
 }
-
-// func (x *defaultVaultService) Append(secret ...SecretKey) {
-
-// 	if len(secret) == 0 {
-// 		return
-// 	}
-
-// 	for _, v := range secret {
-// 		if v.IsEmpty() {
-// 			continue
-// 		}
-// 		x.keychain = append(x.keychain, v)
-// 	}
-
-// }
 
 func (x vaultKeyScope) CurrentKey() (id string, secret []byte, err error) {
 
@@ -170,12 +127,11 @@ type SecretKey struct {
 	ID        string
 	CreatedAt time.Time
 	AuthKey   []byte //   for auth
-	OtpKey    []byte //   otp
-	HashKey   []byte //   key for signup and password changing
+
 }
 
 func (x SecretKey) IsEmpty() bool {
-	return x.ID == "" || len(x.AuthKey) == 0 || len(x.OtpKey) == 0 || len(x.HashKey) == 0
+	return x.ID == "" || len(x.AuthKey) == 0
 }
 func allKeys(appService AppService) (keys []config.AppConfigVaultKey, err error) {
 
@@ -204,8 +160,6 @@ func allKeys(appService AppService) (keys []config.AppConfigVaultKey, err error)
 			keys = append(keys, config.AppConfigVaultKey{
 				ID:      v.ID,
 				AuthKey: v.AuthKey,
-				OtpKey:  v.OtpKey,
-				HashKey: v.HashKey,
 			})
 		}
 	}
@@ -244,12 +198,6 @@ func (x *defaultVaultService) loadKeys(keys []config.AppConfigVaultKey) (err err
 		k.ID = itm.ID
 
 		if k.AuthKey, err = base64.StdEncoding.DecodeString(itm.AuthKey); err != nil {
-			return fmt.Errorf("error on un-base64 key %v :%v", itm.ID, err)
-		}
-		if k.OtpKey, err = base64.StdEncoding.DecodeString(itm.OtpKey); err != nil {
-			return fmt.Errorf("error on un-base64 key %v :%v", itm.ID, err)
-		}
-		if k.HashKey, err = base64.StdEncoding.DecodeString(itm.HashKey); err != nil {
 			return fmt.Errorf("error on un-base64 key %v :%v", itm.ID, err)
 		}
 
