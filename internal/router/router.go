@@ -118,7 +118,7 @@ type tmplRenderer struct {
 
 func (x *tmplRenderer) Render(w io.Writer, name string, data any, c echo.Context) error {
 
-	if name == "auth-admin.html" {
+	if name == "index.html" {
 
 		return x.indexHTML.ExecuteTemplate(w, name, data)
 	}
@@ -129,7 +129,7 @@ func (x *tmplRenderer) Render(w io.Writer, name string, data any, c echo.Context
 
 func mustNewRenderer() echo.Renderer {
 
-	indexHTML, err := template.New("auth-admin.html").Parse(webfs.MustAuthAdminIndexHTML())
+	indexHTML, err := template.New("index.html").Parse(webfs.MustAuthAdminIndexHTML())
 
 	if err != nil {
 		panic(err)
@@ -162,6 +162,9 @@ func initCORSConfig(e *echo.Echo, _ service.AppService) {
 func initDebugController(e *echo.Echo, _ service.AppService) {
 
 	e.GET(consts.PathAuthAdminPingDebugAPI, func(c echo.Context) error { return c.String(http.StatusOK, "pong") })
+	// publicly-available-no-sensitive-data
+	e.GET("/health", func(c echo.Context) error { return c.JSON(http.StatusOK, struct{}{}) })
+
 }
 
 // ///////////////////////////////////////////////////

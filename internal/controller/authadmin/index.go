@@ -15,8 +15,6 @@ import (
 )
 
 type AuthAdminIndexController struct {
-	isAPIMode bool
-
 	appService service.AppService
 	appConfig  *config.AppConfig
 	userLang   i18n.UserLang
@@ -116,11 +114,6 @@ func (x *AuthAdminIndexController) handleDTO() error {
 	return nil
 }
 
-func (x *AuthAdminIndexController) responseDTOAsAPI() (err error) {
-
-	return nil
-}
-
 func (x *AuthAdminIndexController) responseDTOAsMvc() (err error) {
 
 	dto := &x.DTO
@@ -135,7 +128,7 @@ func (x *AuthAdminIndexController) responseDTOAsMvc() (err error) {
 		return err
 	}
 
-	err = c.Render(http.StatusOK, "auth-admin.html", data)
+	err = c.Render(http.StatusOK, "index.html", data)
 
 	if err != nil {
 		return err
@@ -145,9 +138,7 @@ func (x *AuthAdminIndexController) responseDTOAsMvc() (err error) {
 }
 
 func (x *AuthAdminIndexController) responseDTO() (err error) {
-	if x.isAPIMode {
-		return x.responseDTOAsAPI()
-	} else {
-		return x.responseDTOAsMvc()
-	}
+
+	return x.responseDTOAsMvc()
+
 }

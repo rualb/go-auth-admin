@@ -81,7 +81,7 @@ const (
 	PathAuthAdminAssets         = "/auth-admin/assets"
 	PathAuthAdminAccounts       = "/auth-admin/accounts"
 	PathAuthAdminAccountsEntity = "/auth-admin/accounts/:code" // GET
-	PathAuthAdminStatusAPI      = "/auth-admin/api/status"     // private
+	PathAuthAdminStatusAPI      = "/auth-admin/api/status"     // get _csrf, user related, no-cache
 	PathAuthAdminConfigAPI      = "/auth-admin/api/config"     // public
 
 	PathAuthAdminAccountsAPI             = "/auth-admin/api/accounts"            // LIST POST
