@@ -1,8 +1,8 @@
 package authadmin
 
 import (
-	controller "go-auth-admin/internal/controller"
 	"go-auth-admin/internal/service"
+	xweb "go-auth-admin/internal/web"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -51,7 +51,9 @@ type StatusDTO struct {
 	Meta  struct {
 		Status int
 	}
-	Output struct{}
+	Output struct {
+		IsAuth bool `json:"is_auth,omitempty"`
+	}
 }
 
 type StatusAPIController struct {
@@ -74,7 +76,9 @@ func (x *StatusAPIController) Handler() (err error) {
 	output := &dto.Output
 	c := x.webCtxt
 	//
-	controller.CsrfToHeader(c)
+	output.IsAuth = xweb.IsSignedIn(c)
+	//
+	// controller.CsrfToHeader(c)
 	//
 	if meta.Status == 0 {
 		meta.Status = http.StatusOK

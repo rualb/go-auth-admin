@@ -109,7 +109,7 @@ func (x *AuthAdminIndexController) handleDTO() error {
 	cfg := &output.AppConfig
 
 	cfg.AppTitle = x.appConfig.Title
-	cfg.TmTitle = fmt.Sprintf("© %v %s", time.Now().Year(), x.appConfig.Title)
+	cfg.TmTitle = fmt.Sprintf("%s © %d", x.appConfig.Title, time.Now().Year())
 
 	return nil
 }

@@ -29,10 +29,10 @@ func IsPOST(c echo.Context) bool {
 	return c.Request().Method == "POST"
 }
 
-func CsrfToHeader(c echo.Context) {
-	csrf, _ := c.Get("_csrf").(string)
-	c.Response().Header().Set("X-CSRF-Token", csrf)
-}
+// func CsrfToHeader(c echo.Context) {
+// 	csrf, _ := c.Get("_csrf").(string)
+// 	c.Response().Header().Set("X-CSRF-Token", csrf)
+// }
 
 // func newTokenPersist(c echo.Context, appService service.AppService) xtoken.TokenPersist {
 // 	return xweb.NewTokenPersist(c, appService)

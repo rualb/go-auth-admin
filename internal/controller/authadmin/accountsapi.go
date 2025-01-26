@@ -117,13 +117,13 @@ func (x *AccountsAPIController) handleDTO() error {
 
 		//
 
-		if err := bs.UserAccounts().Query(&input.PagingInputDTO, &output.PagingOutputDTO, &userAccountOmit); err != nil {
+		if err := bs.UserAccounts().Query(&input.PagingInputDTO, &output.PagingOutputDTO, userAccountOmit); err != nil {
 			return err
 		}
 
 	} else {
 		meta.Status = http.StatusMethodNotAllowed
-		output.Message = "Method action undef"
+		output.Message = "method action undef"
 	}
 
 	return nil

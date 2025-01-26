@@ -39,7 +39,7 @@ func Init(e *echo.Echo, appService service.AppService) {
 	e.Use(xweb.TokenParserMiddleware(appService))
 
 	//
-	e.Use(xweb.CsrfMiddleware(appService))
+	// e.Use(xweb.CsrfMiddleware(appService))
 
 	initSys(e, appService)
 }
@@ -77,17 +77,17 @@ func AssetsContentsMiddleware(e *echo.Echo, appService service.AppService,
 	assetsAuthAdminFiles fs.FS,
 ) {
 
-	xlog.Info("Start serving embedded static content")
+	xlog.Info("start serving embedded static content")
 
 	// admin
 	{
 
-		xlog.Warn("Adding auth admin assets")
+		xlog.Warn("adding auth admin assets")
 
 		grp := e.Group(consts.PathAuthAdminAssets, func(next echo.HandlerFunc) echo.HandlerFunc {
 			return func(c echo.Context) error {
 				// c.Response().Before()
-				c.Response().Header().Add("Cache-Control", "public,max-age=31536000,immutable")
+				c.Response().Header().Add(`Cache-Control`, "public,max-age=31536000,immutable")
 				return next(c)
 			}
 		},

@@ -23,9 +23,9 @@ var (
 func dumpVersionAndExitIf() {
 
 	if CmdLine.Version {
-		fmt.Printf("Version: %s\n", AppVersion)
-		fmt.Printf("Commit: %s\n", AppCommit)
-		fmt.Printf("Date: %s\n", AppDate)
+		fmt.Printf("version: %s\n", AppVersion)
+		fmt.Printf("commit: %s\n", AppCommit)
+		fmt.Printf("date: %s\n", AppDate)
 		//
 		os.Exit(0)
 	}
@@ -64,19 +64,19 @@ var CmdLine = CmdLineConfig{}
 // ReadFlags read app flags
 func ReadFlags() {
 	_ = os.Args
-	flag.StringVar(&CmdLine.Config, "config", "", "Path to dir with config files")
-	flag.StringVar(&CmdLine.CertDir, "cert-dir", "", "Path to dir with cert files")
-	flag.StringVar(&CmdLine.SysAPIKey, "sys-api-key", "", "Sys api key")
-	flag.StringVar(&CmdLine.Listen, "listen", "", "Listen")
-	flag.StringVar(&CmdLine.ListenTLS, "listen-tls", "", "Listen TLS")
-	flag.StringVar(&CmdLine.ListenSys, "listen-sys", "", "Listen sys")
+	flag.StringVar(&CmdLine.Config, "config", "", "path to dir with config files")
+	flag.StringVar(&CmdLine.CertDir, "cert-dir", "", "path to dir with cert files")
+	flag.StringVar(&CmdLine.SysAPIKey, "sys-api-key", "", "sys api key")
+	flag.StringVar(&CmdLine.Listen, "listen", "", "listen")
+	flag.StringVar(&CmdLine.ListenTLS, "listen-tls", "", "listen TLS")
+	flag.StringVar(&CmdLine.ListenSys, "listen-sys", "", "listen sys")
 
-	flag.StringVar(&CmdLine.Env, "env", "", "Environment: development, testing, staging, production")
-	flag.StringVar(&CmdLine.Name, "name", "", "App name")
+	flag.StringVar(&CmdLine.Env, "env", "", "environment: development, testing, staging, production")
+	flag.StringVar(&CmdLine.Name, "name", "", "app name")
 
-	flag.BoolVar(&CmdLine.Version, "version", false, "App version")
+	flag.BoolVar(&CmdLine.Version, "version", false, "app version")
 
-	flag.BoolVar(&CmdLine.DumpConfig, "dump-config", false, "Dump Config")
+	flag.BoolVar(&CmdLine.DumpConfig, "dump-config", false, "dump config")
 
 	flag.Parse() // dont use from init()
 
@@ -94,7 +94,7 @@ func NewEnvReader() envReader {
 func (x *envReader) String(p *string, name string, cmdValue *string) {
 	envName := strings.ToUpper(x.prefix + name) // *nix case-sensitive
 	if cmdValue != nil && *cmdValue != "" {
-		xlog.Info("Reading %q value from cmd: %v", name, *cmdValue)
+		xlog.Info("reading %q value from cmd: %v", name, *cmdValue)
 		*p = *cmdValue
 		return
 	}
@@ -102,7 +102,7 @@ func (x *envReader) String(p *string, name string, cmdValue *string) {
 	if envName != "" {
 		envValue := os.Getenv(envName)
 		if envValue != "" {
-			xlog.Info("Reading %q value from env: %v = %v", name, envName, envValue)
+			xlog.Info("reading %q value from env: %v = %v", name, envName, envValue)
 			*p = envValue
 			return
 		}
@@ -115,18 +115,19 @@ func (x *envReader) Bool(p *bool, name string, cmdValue *bool) {
 	envName := strings.ToUpper(x.prefix + name) // *nix case-sensitive
 
 	if cmdValue != nil && *cmdValue {
-		xlog.Info("Reading %q value from cmd: %v", name, *cmdValue)
+		xlog.Info("reading %q value from cmd: %v", name, *cmdValue)
 		*p = *cmdValue
 		return
 	}
 	if envName != "" {
 		envValue := os.Getenv(envName)
 		if envValue != "" {
-			xlog.Info("Reading %q value from env: %v = %v", name, envName, envValue)
+			xlog.Info("reading %q value from env: %v = %v", name, envName, envValue)
 			*p = envValue == "1" || envValue == "true"
 			return
 		}
 	}
+
 }
 
 func (x *envReader) Int(p *int, name string, cmdValue *int) {
@@ -134,14 +135,14 @@ func (x *envReader) Int(p *int, name string, cmdValue *int) {
 	envName := strings.ToUpper(x.prefix + name) // *nix case-sensitive
 
 	if cmdValue != nil && *cmdValue != 0 {
-		xlog.Info("Reading %q value from cmd: %v", name, *cmdValue)
+		xlog.Info("reading %q value from cmd: %v", name, *cmdValue)
 		*p = *cmdValue
 		return
 	}
 	if envName != "" {
 		envValue := os.Getenv(envName)
 		if envValue != "" {
-			xlog.Info("Reading %q value from env: %v = %v", name, envName, envValue)
+			xlog.Info("reading %q value from env: %v = %v", name, envName, envValue)
 
 			if v, err := strconv.Atoi(envValue); err == nil {
 				*p = v
@@ -159,6 +160,7 @@ type Database struct {
 	Host      string `json:"host"`
 	Port      string `json:"port"`
 	Name      string `json:"name"`
+	Schema    string `json:"schema"`
 	User      string `json:"user"`
 	Password  string `json:"password"`
 	MaxOpen   int    `json:"max_open"`
@@ -194,7 +196,7 @@ type AppConfigAuth struct {
 }
 
 type AppConfigIdentity struct {
-	PhoneNumberPrefix string `json:"phone_number_prefix"`
+	TelPrefix string `json:"tel_prefix"`
 
 	TokenMaxAge       int    `json:"token_max_age"`     // minutes int
 	AuthTokenIssuer   string `json:"auth_token_issuer"` // default "auth"
@@ -211,8 +213,8 @@ type AppConfigLang struct {
 }
 
 type AppConfigAssets struct {
-	GlobalVersion   string
-	AssetsPublicURL string
+	GlobalVersion   string `json:"global_version"`
+	AssetsPublicURL string `json:"assets_public_url"`
 }
 type AppConfigMod struct {
 	Name  string `json:"-"`
@@ -291,7 +293,7 @@ func NewAppConfig() *AppConfig {
 		},
 
 		Identity: AppConfigIdentity{
-			PhoneNumberPrefix: "+000",
+			TelPrefix: "+000",
 
 			TokenMaxAge: 2592000, //  30day*24hour*60min*60sec ~ 30 days
 
@@ -383,9 +385,9 @@ func (x *AppConfig) readEnvName() error {
 	// }
 
 	if len(configPath) == 0 {
-		xlog.Warn("Config path is empty")
+		xlog.Warn("config path is empty")
 	} else {
-		xlog.Info("Config path: %v", configPath)
+		xlog.Info("config path: %v", configPath)
 	}
 
 	x.ConfigPath = configPath
@@ -396,11 +398,11 @@ func (x *AppConfig) readEnvVar() error {
 	reader := NewEnvReader()
 
 	// Identity configuration
-	reader.String(&x.Identity.PhoneNumberPrefix, "identity_phone_number_prefix", nil)
+	reader.String(&x.Identity.TelPrefix, "identity_tel_prefix", nil)
 
 	// Assets configuration
 	reader.String(&x.Assets.GlobalVersion, "global_version", nil)
-
+	reader.String(&x.Assets.AssetsPublicURL, "assets_public_url", nil)
 	// Database configuration
 
 	reader.String(&x.DB.Dialect, "db_dialect", nil)
@@ -441,7 +443,7 @@ func (x *AppConfig) validateEnv() error {
 	x.Debug = x.Env == envDevelopment
 
 	if !slices.Contains(envNames, x.Env) {
-		xlog.Warn("Non-standart env name: %v", x.Env)
+		xlog.Warn("non-standart env name: %v", x.Env)
 	}
 
 	return nil
@@ -495,7 +497,7 @@ func (x *AppConfigSource) Load() error {
 			dir := res.ConfigPath[i]
 			fileName := fmt.Sprintf("config.%s.json", res.Env)
 
-			xlog.Info("Loading config from: %v", dir)
+			xlog.Info("loading config from: %v", dir)
 
 			err := utilconfig.LoadConfig(res /*pointer*/, dir, fileName)
 
@@ -522,7 +524,7 @@ func (x *AppConfigSource) Load() error {
 		}
 	}
 
-	xlog.Info("Config loaded: Name=%v Env=%v Debug=%v ", res.Name, res.Env, res.Debug)
+	xlog.Info("config loaded: Name=%v Env=%v Debug=%v ", res.Name, res.Env, res.Debug)
 
 	x.config = res
 

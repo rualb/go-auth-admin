@@ -104,19 +104,19 @@ func (x *AccountsEntityAPIController) validateDTOFields() (err error) {
 		}
 
 		{
-			_ = output.NewModelValidatorStr(x.userLang, "username", "Username", input.Data.Username, consts.DefaultTextLength)
+			_ = output.NewModelValidatorStr(x.userLang, "username", "Username" /*Lang*/, input.Data.Username, consts.DefaultTextLength)
 			// v.Required()
 		}
 		{
-			_ = output.NewModelValidatorStr(x.userLang, "roles", "Roles", input.Data.Roles, consts.DefaultTextLength)
+			_ = output.NewModelValidatorStr(x.userLang, "roles", "Roles" /*Lang*/, input.Data.Roles, consts.DefaultTextLength)
 			// v.Required()
 		}
 		{
-			_ = output.NewModelValidatorStr(x.userLang, "phone_number", "Phone number", input.Data.PhoneNumber, consts.DefaultTextLength)
+			_ = output.NewModelValidatorStr(x.userLang, "tel", "Phone number" /*Lang*/, input.Data.Tel, consts.DefaultTextLength)
 			// v.Required()
 		}
 		{
-			_ = output.NewModelValidatorStr(x.userLang, "email", "Email", input.Data.Email, consts.DefaultTextLength)
+			_ = output.NewModelValidatorStr(x.userLang, "email", "Email" /*Lang*/, input.Data.Email, consts.DefaultTextLength)
 			// v.Required()
 		}
 
@@ -157,14 +157,14 @@ func (x *AccountsEntityAPIController) validateDTOFields() (err error) {
 			}
 		}
 		{
-			val := input.Data.PhoneNumber
-			id, err := srv.UserAccounts().PhoneNumber(val)
+			val := input.Data.Tel
+			id, err := srv.UserAccounts().Tel(val)
 			if err != nil {
 				return err
 			}
 			if !(id == "" || input.ID == id) {
-				meta.Status = http.StatusConflict                                             // e.g., duplicate data 409
-				output.AddError("phone_number", x.userLang.Lang("Duplicate entry {0}.", val)) // Lang
+				meta.Status = http.StatusConflict                                    // e.g., duplicate data 409
+				output.AddError("tel", x.userLang.Lang("Duplicate entry {0}.", val)) // Lang
 				return nil
 			}
 		}
@@ -184,7 +184,7 @@ func (x *AccountsEntityAPIController) validateDTOFields() (err error) {
 
 	if x.IsPOST || x.IsPUT {
 
-		input.Data.SetPhoneNumber(input.Data.PhoneNumber)
+		input.Data.SetTel(input.Data.Tel)
 		input.Data.SetEmail(input.Data.Email)
 		input.Data.SetUsername(input.Data.Username)
 
@@ -294,7 +294,7 @@ func (x *AccountsEntityAPIController) handleDTO() error {
 	default:
 		{
 			meta.Status = http.StatusMethodNotAllowed
-			output.AddError("", "Method GET only")
+			output.AddError("", "method GET only")
 		}
 	}
 

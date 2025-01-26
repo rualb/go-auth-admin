@@ -16,31 +16,31 @@ func Test_userLang_Lang(t *testing.T) {
 		// TODO: Add test cases.
 
 		{
-			name: "Test with single argument",
+			name: "test with single argument",
 			x:    &userLang{}, // Initialize with actual instance if needed
 			args: args{
-				text: "Hello, {0}!",
-				args: []any{"World"},
+				text: "hello, {0}!",
+				args: []any{"world"},
 			},
-			want: "Hello, World!",
+			want: "hello, world!",
 		},
 		{
-			name: "Test with multiple arguments",
+			name: "test with multiple arguments",
 			x:    &userLang{}, // Initialize with actual instance if needed
 			args: args{
 				text: "{0} is {1} years old.",
-				args: []any{"Alice", 30},
+				args: []any{"alice", 30},
 			},
-			want: "Alice is 30 years old.",
+			want: "alice is 30 years old.",
 		},
 		{
-			name: "Test with no arguments",
+			name: "test with no arguments",
 			x:    &userLang{}, // Initialize with actual instance if needed
 			args: args{
-				text: "No arguments here.",
+				text: "no arguments here.",
 				args: []any{},
 			},
-			want: "No arguments here.",
+			want: "no arguments here.",
 		},
 	}
 	for _, tt := range tests {

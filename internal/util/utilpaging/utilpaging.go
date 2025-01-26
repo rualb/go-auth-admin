@@ -1,12 +1,14 @@
 package utilpaging
 
+type Filters map[string]string
+
 type PagingInputDTO struct {
-	Page   int    `query:"page"`
-	Sort   string `query:"sort"`
-	Search string `query:"search"`
-	Cursor string `query:"cursor"`
-	// Filter   map[string][]string //  c.QueryParams() ref
-	Limit int `query:"limit"`
+	Page    int     `query:"page"`
+	Sort    string  `query:"sort"`
+	Search  string  `query:"search"`
+	Cursor  string  `query:"cursor"`
+	Filters Filters `` // query:"filters"
+	Limit   int     `query:"limit"`
 }
 
 // func (x *PagingInputDTO) GetFilter(code string) string {
@@ -117,12 +119,12 @@ func unique(intSlice []int) []int {
 
 type PagingOutputDTO[T any] struct {
 	Filter struct {
-		Page   int    `json:"page,omitempty"`
-		Sort   string `json:"sort,omitempty"`
-		Search string `json:"search,omitempty"`
-		Cursor string `json:"cursor,omitempty"`
-		// Filter     map[string][]string `json:"filter"`
-		Limit int `json:"limit,omitempty"`
+		Page    int     `json:"page,omitempty"`
+		Sort    string  `json:"sort,omitempty"`
+		Search  string  `json:"search,omitempty"`
+		Cursor  string  `json:"cursor,omitempty"`
+		Filters Filters `json:"filters,omitempty"`
+		Limit   int     `json:"limit,omitempty"`
 	} `json:"filter,omitempty"`
 
 	Info struct {
@@ -138,6 +140,7 @@ func (x *PagingOutputDTO[T]) Fill(filter *PagingInputDTO, info *PagingInfo) {
 	x.Filter.Limit = info.Limit
 	x.Filter.Sort = filter.Sort
 	x.Filter.Search = filter.Search
+	x.Filter.Filters = filter.Filters
 
 	//
 	// x.Cursor = info.Cursor

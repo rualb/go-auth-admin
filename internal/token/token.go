@@ -25,10 +25,10 @@ type TokenPersist interface {
 }
 
 type TokenClaimsDTO struct {
-	PhoneNumber string           `json:"phone_number,omitempty"`
-	UserID      string           `json:"user_id,omitempty"`
-	Email       string           `json:"email,omitempty"`
-	Scope       jwt.ClaimStrings `json:"scope,omitempty"` // as []string and as string
+	Tel    string           `json:"tel,omitempty"`
+	UserID string           `json:"user_id,omitempty"`
+	Email  string           `json:"email,omitempty"`
+	Scope  jwt.ClaimStrings `json:"scope,omitempty"` // as []string and as string
 	jwt.RegisteredClaims
 }
 
@@ -71,9 +71,9 @@ func (x *TokenClaimsDTO) HasScope(scope string) bool {
 	return false
 }
 
-func (x TokenClaimsDTO) IsPhoneNumberMatch(value string) bool {
+func (x TokenClaimsDTO) IsTelMatch(value string) bool {
 
-	return x.PhoneNumber == value
+	return x.Tel == value
 }
 
 // func (x TokenClaimsDTO) IsAudienceMatch(value string) bool {

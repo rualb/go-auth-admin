@@ -1,12 +1,17 @@
 package main
 
 import (
+	"cmp"
+	_ "embed"
 	"go-auth-admin/internal/cmd"
 	"go-auth-admin/internal/config"
 
 	"go-auth-admin/internal/config/consts"
 	xlog "go-auth-admin/internal/util/utillog"
 )
+
+//go:embed date
+var date string
 
 //nolint:gochecknoglobals
 var (
@@ -18,7 +23,7 @@ var (
 
 func main() {
 
-	xlog.Info("Build info: [name: %v] [version: %v] [date: %v] [short-commit: %v]", consts.AppName, Version, Date, ShortCommit)
+	xlog.Info("build info: [name: %v] [version: %v] [date: %v] [short-commit: %v]", consts.AppName, Version, cmp.Or(Date, date), ShortCommit)
 
 	config.AppVersion, config.AppCommit, config.AppDate, config.ShortCommit = Version, Commit, Date, ShortCommit
 

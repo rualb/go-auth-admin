@@ -8,11 +8,11 @@ import (
 )
 
 type AppMessenger interface {
-	// SendSms(text string, phoneNumber string)
+	// SendSms(text string, tel string)
 	// SendEmail(html string, subject string, email string)
 
-	SendSecretCodeToPhoneNumber(code string, phoneNumber string, lang string)
-	SendSecretCodeToEmail(code string, email string, lang string)
+	SendPasscodeToTel(code string, tel string, lang string)
+	SendPasscodeToEmail(code string, email string, lang string)
 }
 
 type defaultAppMessenger struct {
@@ -41,13 +41,13 @@ func NewAppMessenger(config *config.AppConfig,
 	return
 }
 
-func (x *defaultAppMessenger) SendSecretCodeToPhoneNumber(secretCode string, phoneNumber string, lang string) {
-	serviceCode := "sms-secret-code" // _ -
+func (x *defaultAppMessenger) SendPasscodeToTel(passcode string, tel string, lang string) {
+	serviceCode := "sms-passcode" // _ -
 
 	formValues := map[string]string{
-		"to":          phoneNumber,
-		"secret_code": secretCode,
-		"lang":        lang,
+		"to":       tel,
+		"passcode": passcode,
+		"lang":     lang,
 	}
 
 	if x.Debug || x.config.Stdout {
@@ -56,22 +56,22 @@ func (x *defaultAppMessenger) SendSecretCodeToPhoneNumber(secretCode string, pho
 
 	URL := strings.ReplaceAll(x.config.ServiceURL, "{code}", serviceCode)
 
-	_, err := utilhttp.PostFormURL(URL, nil, formValues, nil)
+	_, err := utilhttp.PostFormURL(URL, nil, nil, formValues)
 
 	if err != nil {
-		xlog.Error("Error from sms service: %v", err)
+		xlog.Error("error from sms service: %v", err)
 	}
 
 }
 
-func (x *defaultAppMessenger) SendSecretCodeToEmail(secretCode string, email string, lang string) {
+func (x *defaultAppMessenger) SendPasscodeToEmail(passcode string, email string, lang string) {
 
-	serviceCode := "email-secret-code" // _ -
+	serviceCode := "email-passcode" // _ -
 
 	formValues := map[string]string{
-		"to":          email,
-		"secret_code": secretCode,
-		"lang":        lang,
+		"to":       email,
+		"passcode": passcode,
+		"lang":     lang,
 	}
 
 	if x.Debug || x.config.Stdout {
@@ -80,10 +80,10 @@ func (x *defaultAppMessenger) SendSecretCodeToEmail(secretCode string, email str
 
 	URL := strings.ReplaceAll(x.config.ServiceURL, "{code}", serviceCode)
 
-	_, err := utilhttp.PostFormURL(URL, nil, formValues, nil)
+	_, err := utilhttp.PostFormURL(URL, nil, nil, formValues)
 
 	if err != nil {
-		xlog.Error("Error from sms service: %v", err)
+		xlog.Error("error from sms service: %v", err)
 	}
 
 }

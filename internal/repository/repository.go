@@ -25,7 +25,7 @@ type AppRepository interface {
 	First(out interface{}, where ...interface{}) *gorm.DB
 	Raw(sql string, values ...interface{}) *gorm.DB
 	Create(value interface{}) *gorm.DB
-	// gorm insert or update all fileds
+	// gorm insert or update all fields
 	Save(value interface{}) *gorm.DB
 	// gorm update non-zero fields by default
 	Updates(value interface{}) *gorm.DB
@@ -111,13 +111,18 @@ func connectDatabase(
 	if cfg.Debug {
 		// init logger before connect
 		gormConfig.Logger = logger.Default.LogMode(logger.Info)
-		gormConfig.Logger.Info(context.TODO(), "Gorm logger mode: info/debug")
+		gormConfig.Logger.Info(context.TODO(), "gorm logger mode: info/debug")
 	}
 
 	if cfg.Dialect == POSTGRES {
-		dsn = fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=disable",
+		dsn = fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s connect_timeout=%s application_name=%s sslmode=disable ",
 			cfg.Host, cfg.Port, cfg.User,
-			cfg.Name, cfg.Password)
+			cfg.Name, cfg.Password, "10", appConfig.Name /*split*/)
+
+		if cfg.Schema != "" {
+			dsn += " search_path=" + cfg.Schema //  search_path=your_schema
+		}
+
 		return gorm.Open(postgres.Open(dsn), gormConfig)
 	} else if cfg.Dialect == SQLITE {
 		return gorm.Open(sqlite.Open(cfg.Host), gormConfig)

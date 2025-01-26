@@ -11,11 +11,11 @@ import (
 )
 
 const (
-	IssuerConfirmPhoneNumber = "confirm_phone"
-	IssuerConfirmEmail       = "confirm_email"
+	IssuerConfirmTel   = "confirm_tel"
+	IssuerConfirmEmail = "confirm_email"
 )
 const (
-	TokenLifetimeSignupWithPhoneNumber = time.Minute * 30 // 30 minutes
+	TokenLifetimeSignupWithTel = time.Minute * 30 // 30 minutes
 
 	TokenLifetimeSignupWithEmail = time.Minute * 30 // 30 minutes
 )
@@ -27,7 +27,7 @@ const (
 type UserAccount struct {
 	ID              string `json:"id" gorm:"size:255;primaryKey"`
 	Username        string `json:"username,omitempty" gorm:"size:255;uniqueIndex:,where:username != ''"`
-	PhoneNumber     string `json:"phone_number,omitempty" gorm:"size:255;uniqueIndex:,where:phone_number != ''"`
+	Tel             string `json:"tel,omitempty" gorm:"size:255;uniqueIndex:,where:tel != ''"`
 	Email           string `json:"email,omitempty" gorm:"size:255"`                             // use this on emailing and show
 	NormalizedEmail string `json:"-" gorm:"size:255;uniqueIndex:,where:normalized_email != ''"` // use this on search
 	// SecurityStamp   string // Key := Base32(Random(32))  HMACSHA1(Key)  Key == VTOQQ2PQKD7A2KTSXU7OFLKUNI7QEZRJ
@@ -46,9 +46,9 @@ func (x *UserAccount) SetUsername(value string) {
 	x.Username = valueNorm
 }
 
-func (x *UserAccount) SetPhoneNumber(value string) {
-	valueNorm := utilstring.NormalizePhoneNumber(value)
-	x.PhoneNumber = valueNorm
+func (x *UserAccount) SetTel(value string) {
+	valueNorm := utilstring.NormalizeTel(value)
+	x.Tel = valueNorm
 
 	// x.Username = valueNorm
 }
@@ -123,13 +123,13 @@ func (x defaultAccountService) FindByID(id string) (*UserAccount, error) {
 		return nil, nil // fmt.Errorf("id cannot be empty")
 	}
 
-	user := new(UserAccount)
+	data := new(UserAccount)
 
-	result := x.appService.Repository().Find(user, "id = ?", id)
+	result := x.appService.Repository().Find(data, "id = ?", id)
 
 	if result.Error != nil || result.RowsAffected == 0 {
 		return nil, result.Error
 	}
 
-	return user, nil
+	return data, nil
 }

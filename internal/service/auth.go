@@ -68,7 +68,7 @@ func (x *UserAccountDAO) Where(filter *utilpaging.PagingInputDTO) (whereConditio
 	whereArgs = []any{}
 
 	if v := filter.Search; v != "" { // filter.GetFilter("text");
-		whereCondition += " and (username ilike ? or email ilike ? or phone_number ilike ?)" // " and (title ilike ? or content_md ilike ?)"
+		whereCondition += " and (username ilike ? or email ilike ? or tel ilike ?)" // " and (title ilike ? or content_md ilike ?)"
 		whereArgs = append(whereArgs, "%"+v+"%", "%"+v+"%", "%"+v+"%")
 	}
 
@@ -94,15 +94,20 @@ func (x *UserAccountDAO) Sort(filter *utilpaging.PagingInputDTO) (sqlSort string
 	return sqlSort, err
 }
 
-func (x *UserAccountDAO) Query(filter *utilpaging.PagingInputDTO, output *utilpaging.PagingOutputDTO[UserAccount], omitColumns *[]string) (err error) {
+func (x *UserAccountDAO) Query(filter *utilpaging.PagingInputDTO, output *utilpaging.PagingOutputDTO[UserAccount], omitColumns []string) (err error) {
 
 	x.Check(filter)
 
 	repo := x.appService.Repository()
 
-	sqlWhere, sqlWhereArgs, _ := x.Where(filter)
-	sqlSort, _ := x.Sort(filter)
-
+	sqlWhere, sqlWhereArgs, err := x.Where(filter)
+	if err != nil {
+		return err
+	}
+	sqlSort, err := x.Sort(filter)
+	if err != nil {
+		return err
+	}
 	var count int64
 
 	err = repo.Model(&UserAccount{}).
@@ -118,13 +123,13 @@ func (x *UserAccountDAO) Query(filter *utilpaging.PagingInputDTO, output *utilpa
 	output.Data = make([]*UserAccount, 0, info.Limit)
 
 	if omitColumns == nil {
-		omitColumns = &[]string{}
+		omitColumns = []string{}
 	}
 
 	err = repo.
 		Where(sqlWhere, sqlWhereArgs...).
 		Order(sqlSort).
-		Omit(*omitColumns...). // ContentMD ContentHTML
+		Omit(omitColumns...). // ContentMD ContentHTML
 		Limit(info.Limit).
 		Offset(info.Offset).
 		Find(&output.Data).Error
@@ -141,45 +146,45 @@ func (x *UserAccountDAO) FindByID(id string) (*UserAccount, error) {
 		return nil, nil // fmt.Errorf("id cannot be empty")
 	}
 
-	user := new(UserAccount)
+	data := new(UserAccount)
 
-	result := x.appService.Repository().Find(user, "id = ?", id)
+	result := x.appService.Repository().Find(data, "id = ?", id)
 
 	if result.Error != nil || result.RowsAffected == 0 {
 		return nil, result.Error
 	}
 
-	return user, nil
+	return data, nil
 }
 func (x *UserAccountDAO) FindByCode(code string) (*UserAccount, error) {
 	if code == "" {
 		return nil, nil // fmt.Errorf("id cannot be empty")
 	}
 
-	user := new(UserAccount)
+	data := new(UserAccount)
 
-	result := x.appService.Repository().Find(user, "code = ?", code)
+	result := x.appService.Repository().Find(data, "code = ?", code)
 
 	if result.Error != nil || result.RowsAffected == 0 {
 		return nil, result.Error
 	}
 
-	return user, nil
+	return data, nil
 }
 func (x *UserAccountDAO) ID(id string) (string, error) {
 	if id == "" {
 		return "", nil // fmt.Errorf("id cannot be empty")
 	}
 
-	user := new(UserAccount)
+	data := new(UserAccount)
 
-	result := x.appService.Repository().Select("id").Limit(1).Find(user, "id = ? ", id)
+	result := x.appService.Repository().Select("id").Limit(1).Find(data, "id = ? ", id)
 
 	if result.Error != nil || result.RowsAffected == 0 {
 		return "", result.Error
 	}
 
-	return user.ID, nil
+	return data.ID, nil
 }
 
 func (x *UserAccountDAO) Username(username string) (string, error) {
@@ -187,48 +192,48 @@ func (x *UserAccountDAO) Username(username string) (string, error) {
 		return "", nil // fmt.Errorf("id cannot be empty")
 	}
 
-	user := new(UserAccount)
+	data := new(UserAccount)
 
-	result := x.appService.Repository().Select("id").Find(user, "username = ?", username)
+	result := x.appService.Repository().Select("id").Find(data, "username = ?", username)
 
 	if result.Error != nil || result.RowsAffected == 0 {
 		return "", result.Error
 	}
 
-	return user.ID, nil
+	return data.ID, nil
 }
 func (x *UserAccountDAO) Email(email string) (string, error) {
 	if email == "" {
 		return "", nil // fmt.Errorf("id cannot be empty")
 	}
 
-	user := new(UserAccount)
+	data := new(UserAccount)
 
-	result := x.appService.Repository().Select("id").Find(user, "email = ?", email)
+	result := x.appService.Repository().Select("id").Find(data, "email = ?", email)
 
 	if result.Error != nil || result.RowsAffected == 0 {
 		return "", result.Error
 	}
 
-	return user.ID, nil
+	return data.ID, nil
 }
-func (x *UserAccountDAO) PhoneNumber(phoneNumber string) (string, error) {
+func (x *UserAccountDAO) Tel(tel string) (string, error) {
 
-	phoneNumber = utilstring.NormalizePhoneNumber(phoneNumber) // Normalize
+	tel = utilstring.NormalizeTel(tel) // Normalize
 
-	if phoneNumber == "" {
+	if tel == "" {
 		return "", nil // fmt.Errorf("id cannot be empty")
 	}
 
-	user := new(UserAccount)
+	data := new(UserAccount)
 
-	result := x.appService.Repository().Select("id").Find(user, "phone_number = ?", phoneNumber)
+	result := x.appService.Repository().Select("id").Find(data, "tel = ?", tel)
 
 	if result.Error != nil || result.RowsAffected == 0 {
 		return "", result.Error
 	}
 
-	return user.ID, nil
+	return data.ID, nil
 }
 
 func (x *UserAccountDAO) Create(data *UserAccount) error {
@@ -242,7 +247,7 @@ func (x *UserAccountDAO) Create(data *UserAccount) error {
 func (x *UserAccountDAO) Update(data *UserAccount) error {
 	repo := x.appService.Repository()
 
-	// res := repo.Model(data).Omit(userAccountOmit...).Updates(data) // .Updates() ignores zero-fileds
+	// res := repo.Model(data).Omit(userAccountOmit...).Updates(data) // .Updates() ignores zero-fields
 
 	// res := repo.Model(data).Omit(userAccountOmit...).Save(data)
 

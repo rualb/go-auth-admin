@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"go-auth-admin/internal/config"
 	"go-auth-admin/internal/config/consts"
-	utilstring "go-auth-admin/internal/util/utilstring"
+	"go-auth-admin/internal/util/utilhttp"
 	xweb "go-auth-admin/internal/web"
 	"html/template"
 	"io"
@@ -31,11 +31,11 @@ type ModelAppConfig struct {
 }
 
 type ModelConst struct {
-	SecretCodeLength     int // 6
-	PasswordMinLength    int // 8
-	DefaultTextLength    int // 100
-	PhoneNumberMinLength int // 8
-	PhoneNumberMaxLength int // 14
+	PasscodeLength    int // 6
+	PasswordMinLength int // 8
+	DefaultTextLength int // 100
+	TelMinLength      int // 8
+	TelMaxLength      int // 14
 }
 type ModelPrm struct {
 	Title      string
@@ -71,7 +71,7 @@ func NewModelWrap(c echo.Context, model any, isFragment bool, title string, appC
 		API: ModelAPI{
 			Icon:            AppIcons,
 			Lang:            lang.Lang,
-			URL:             utilstring.AppendURL,
+			URL:             utilhttp.AppendURL,
 			IsAuthenticated: xweb.IsSignedIn(c),
 		},
 		Prm: ModelPrm{
@@ -86,25 +86,25 @@ func NewModelWrap(c echo.Context, model any, isFragment bool, title string, appC
 
 			AppConfig: ModelAppConfig{
 				AppTitle:        appConfig.Title,
-				CopyrightTitle:  fmt.Sprintf("© %v %v", time.Now().UTC().Year(), appConfig.Title),
+				CopyrightTitle:  fmt.Sprintf("%s © %d", appConfig.Title, time.Now().UTC().Year()),
 				GlobalVersion:   appConfig.Assets.GlobalVersion,
 				AssetsPublicURL: appConfig.Assets.AssetsPublicURL,
 			},
 			AppConst: ModelConst{
-				SecretCodeLength:     consts.SecretCodeLength,
-				PasswordMinLength:    consts.PasswordMinLength,
-				DefaultTextLength:    consts.DefaultTextLength, // 100
-				PhoneNumberMinLength: consts.PhoneNumberMinLength,
-				PhoneNumberMaxLength: consts.PhoneNumberMaxLength,
+				PasscodeLength:    consts.PasscodeLength,
+				PasswordMinLength: consts.PasswordMinLength,
+				DefaultTextLength: consts.DefaultTextLength, // 100
+				TelMinLength:      consts.TelMinLength,
+				TelMaxLength:      consts.TelMaxLength,
 			},
 		},
 	}
 
 	data, err := json.Marshal(map[string]any{
-		"test":                  `"<>`,
-		"prm_lang_code":         res.Prm.LangCode,
-		"prm_assets_public_url": res.Prm.AppConfig.AssetsPublicURL,
-		"prm_global_version":    res.Prm.AppConfig.GlobalVersion,
+		"test":              `"<>`,
+		"lang_code":         res.Prm.LangCode,
+		"assets_public_url": res.Prm.AppConfig.AssetsPublicURL,
+		"global_version":    res.Prm.AppConfig.GlobalVersion,
 	})
 
 	if err != nil {

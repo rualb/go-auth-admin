@@ -180,10 +180,10 @@ func (x *ModelValidatorStr) Email(minLen int) (hasError bool) {
 	return false
 }
 
-// // PhoneNumberBody checks if the field's value is a valid phone number body.
-// func (x *ModelValidatorStr) PhoneNumberBody() (hasError bool) {
+// // TelBody checks if the field's value is a valid phone number body.
+// func (x *ModelValidatorStr) TelBody() (hasError bool) {
 // 	v := x.fieldValue
-// 	if len(v) > 0 && !utilstring.IsPhoneNumberBody(v) {
+// 	if len(v) > 0 && !utilstring.IsTelBody(v) {
 // 		x.model.AddError(utileldName,
 // 			x.lang.Lang("Please enter a valid phone number" /*Lang*/),
 // 		)
@@ -194,10 +194,10 @@ func (x *ModelValidatorStr) Email(minLen int) (hasError bool) {
 
 // }
 
-// // PhoneNumberPrefix checks if the field's value is a valid phone number prefix.
-// func (x *ModelValidatorStr) PhoneNumberPrefix() (hasError bool) {
+// // TelPrefix checks if the field's value is a valid phone number prefix.
+// func (x *ModelValidatorStr) TelPrefix() (hasError bool) {
 // 	v := x.fieldValue
-// 	if len(v) > 0 && !utilstring.IsPhoneNumberPrefix(v) {
+// 	if len(v) > 0 && !utilstring.IsTelPrefix(v) {
 // 		x.model.AddError(x.fieldName,
 // 			x.lang.Lang("Please enter a valid phone number" /*Lang*/),
 // 		)
@@ -208,10 +208,10 @@ func (x *ModelValidatorStr) Email(minLen int) (hasError bool) {
 
 // }
 
-// PhoneNumber checks if the field's value is a valid phone number.
-func (x *ModelValidatorStr) PhoneNumber() (hasError bool) {
+// Tel checks if the field's value is a valid phone number.
+func (x *ModelValidatorStr) Tel() (hasError bool) {
 	v := x.fieldValue
-	if len(v) > 0 && !utilstring.IsPhoneNumberFull(v) {
+	if len(v) > 0 && !utilstring.IsTelFull(v) {
 		x.model.AddError(x.fieldName,
 			x.lang.Lang("Please enter a valid phone number." /*Lang*/),
 		)

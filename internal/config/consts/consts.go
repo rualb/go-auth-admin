@@ -9,15 +9,15 @@ const StatusSuccess = "success"
 
 // App consts
 const (
-	PhoneNumberMinLength = 2 + 8  // 1+9
-	PhoneNumberMaxLength = 4 + 15 // 1+18
+	TelMinLength = 2 + 8  // 1+9
+	TelMaxLength = 4 + 15 // 1+18
 
 	EmailMinLength = 6
 
 	PasswordMinLength = 8
 	PasswordMaxLength = 50 // bcrypt 72
 
-	SecretCodeLength      = 8
+	PasscodeLength        = 8
 	LongTextLength        = 32767 //  int(int16(^uint16(0) >> 1)) // equivalent of short.MaxValue
 	DefaultTextLength     = 100
 	DefaultMapZoom        = 12

@@ -11,7 +11,7 @@ import (
 	"go-auth-admin/internal/config/consts"
 	"go-auth-admin/internal/service"
 	xtoken "go-auth-admin/internal/token"
-	"go-auth-admin/internal/util/utilstring"
+	"go-auth-admin/internal/util/utilhttp"
 	"net/http"
 	"strings"
 	"time"
@@ -70,24 +70,37 @@ func (x *tokenPersist) RotateAuthToken(forceRotate bool) {
 	}
 
 }
-func CsrfMiddleware(appService service.AppService) echo.MiddlewareFunc {
 
-	csrfConfig := middleware.CSRFConfig{
-		Skipper: assetsReqSkipper,
-
-		TokenLookup: "header:X-CSRF-Token,form:_csrf",
-		CookiePath:  "/",
-		// CookieDomain:   "example.com",
-		// CookieSecure:   true, // https only
-		CookieHTTPOnly: true,
-		CookieName:     "_csrf",
-		ContextKey:     "_csrf",
-		CookieSameSite: http.SameSiteDefaultMode,
+func assetsReqSkipper(c echo.Context) bool {
+	path := c.Request().URL.Path
+	prefixes := []string{consts.PathAuthAdminAssets}
+	for _, prefix := range prefixes {
+		if strings.HasPrefix(path, prefix) {
+			// Skip the middleware
+			return true
+		}
 	}
-
-	return middleware.CSRFWithConfig(csrfConfig)
-
+	return false
 }
+
+// func CsrfMiddleware(appService service.AppService) echo.MiddlewareFunc {
+
+// 	csrfConfig := middleware.CSRFConfig{
+// 		Skipper: assetsReqSkipper,
+
+// 		TokenLookup: "header:X-CSRF-Token,form:_csrf",
+// 		CookiePath:  "/",
+// 		// CookieDomain:   "example.com",
+// 		// CookieSecure:   true, // https only
+// 		CookieHTTPOnly: true,
+// 		CookieName:     "_csrf",
+// 		ContextKey:     "_csrf",
+// 		CookieSameSite: http.SameSiteDefaultMode,
+// 	}
+
+// 	return middleware.CSRFWithConfig(csrfConfig)
+
+// }
 func UserLangMiddleware(appService service.AppService) echo.MiddlewareFunc {
 
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
@@ -107,7 +120,9 @@ func UserLangMiddleware(appService service.AppService) echo.MiddlewareFunc {
 					lang = lang2.Value
 				} else {
 					// Fallback to the Accept-Language header
-					lang3 := c.Request().Header.Get("Accept-Language")
+					lang3 := c.Request().Header.Get(
+						`Accept-Language`,
+					)
 					if len(lang3) > 2 {
 						lang3 = lang3[:2]
 						if appService.HasLang(lang3) {
@@ -119,7 +134,7 @@ func UserLangMiddleware(appService service.AppService) echo.MiddlewareFunc {
 
 			c.Set("lang_code", lang)
 
-			c.Response().Header().Set("Content-Language", lang)
+			c.Response().Header().Set(`Content-Language`, lang)
 
 			return next(c)
 		}
@@ -175,7 +190,7 @@ func TokenParserMiddleware(appService service.AppService) echo.MiddlewareFunc {
 
 // 				if reddirect {
 // 					reqURI := c.Request().RequestURI // "/dashboard?view=weekly"
-// 					redirectURL := utilstring.AppendURL(consts.PathAuthSignin, "return_url", reqURI)
+// 					redirectURL := utilhttp.AppendURL(consts.PathAuthSignin, "next", reqURI)
 // 					return c.Redirect(http.StatusFound /*302*/, redirectURL)
 // 				} else {
 // 					return c.NoContent(http.StatusUnauthorized) // 401
@@ -230,7 +245,7 @@ func AuthorizeMiddlewareWithConfig(cfg AuthorizeMiddlewareConfig) echo.Middlewar
 
 					if cfg.Reddirect {
 						reqURI := c.Request().RequestURI // "/dashboard?view=weekly"
-						redirectURL := utilstring.AppendURL(cfg.ReddirectURL, "return_url", reqURI)
+						redirectURL := utilhttp.AppendURL(cfg.ReddirectURL, "next", reqURI)
 						return c.Redirect(http.StatusFound /*302*/, redirectURL)
 					} else {
 						return c.NoContent(http.StatusUnauthorized) // 401
@@ -279,18 +294,6 @@ func TokenRotateMiddleware(appService service.AppService) echo.MiddlewareFunc {
 			return next(c)
 		}
 	}
-}
-
-func assetsReqSkipper(c echo.Context) bool {
-	path := c.Request().URL.Path
-	prefixes := []string{consts.PathAuthAdminAssets}
-	for _, prefix := range prefixes {
-		if strings.HasPrefix(path, prefix) {
-			// Skip the middleware
-			return true
-		}
-	}
-	return false
 }
 
 func jwtParseSuccessHandler(c echo.Context) {
