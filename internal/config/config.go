@@ -168,6 +168,7 @@ type Database struct {
 	IdleTime  int    `json:"idle_time"`
 	Migration bool   `json:"migration"`
 	Debug     bool   `json:"debug"`
+	SSL       bool   `json:"ssl"`
 }
 
 // type AppConfigLogger struct {
@@ -304,15 +305,16 @@ func NewAppConfig() *AppConfig {
 			ServiceURL: "http://127.0.0.1:30780/sys/api/messenger/{code}", // prefix of url
 		},
 		DB: Database{
-			Dialect:  "postgres",
-			Host:     "127.0.0.1",
-			Port:     "5432",
-			Name:     "postgres",
-			User:     "postgres",
-			Password: "postgres",
-			MaxOpen:  0,
-			MaxIdle:  0,
-			IdleTime: 0,
+			Dialect:   "postgres",
+			Host:      "127.0.0.1",
+			Port:      "5432",
+			Name:      "postgres",
+			User:      "postgres",
+			Password:  "postgres",
+			MaxOpen:   0,
+			MaxIdle:   0,
+			IdleTime:  0,
+			Migration: true,
 		},
 		Redis: Database{
 			Host:     "127.0.0.1",
@@ -415,6 +417,7 @@ func (x *AppConfig) readEnvVar() error {
 	reader.Int(&x.DB.MaxIdle, "db_max_idle", nil)
 	reader.Int(&x.DB.IdleTime, "db_idle_time", nil)
 	reader.Bool(&x.DB.Migration, "db_migration", nil)
+	reader.Bool(&x.DB.SSL, "db_ssl", nil)
 
 	// General configuration
 	reader.String(&x.Title, "title", nil)

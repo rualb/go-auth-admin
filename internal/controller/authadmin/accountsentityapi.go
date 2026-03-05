@@ -150,7 +150,7 @@ func (x *AccountsEntityAPIController) validateDTOFields() (err error) {
 			if err != nil {
 				return err
 			}
-			if !(id == "" || input.ID == id) {
+			if id != "" && input.ID != id {
 				meta.Status = http.StatusConflict                                         // e.g., duplicate data 409
 				output.AddError("username", x.userLang.Lang("Duplicate entry {0}.", val)) // Lang
 				return nil
@@ -162,7 +162,7 @@ func (x *AccountsEntityAPIController) validateDTOFields() (err error) {
 			if err != nil {
 				return err
 			}
-			if !(id == "" || input.ID == id) {
+			if id != "" && input.ID != id {
 				meta.Status = http.StatusConflict                                    // e.g., duplicate data 409
 				output.AddError("tel", x.userLang.Lang("Duplicate entry {0}.", val)) // Lang
 				return nil
@@ -174,7 +174,7 @@ func (x *AccountsEntityAPIController) validateDTOFields() (err error) {
 			if err != nil {
 				return err
 			}
-			if !(id == "" || input.ID == id) {
+			if id != "" && input.ID != id {
 				meta.Status = http.StatusConflict                                      // e.g., duplicate data 409
 				output.AddError("email", x.userLang.Lang("Duplicate entry {0}.", val)) // Lang
 				return nil

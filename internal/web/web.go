@@ -8,7 +8,6 @@ validate ExpiresAt,Issuer,Audience
 */
 import (
 	"fmt"
-	"go-auth-admin/internal/config/consts"
 	"go-auth-admin/internal/service"
 	xtoken "go-auth-admin/internal/token"
 	"go-auth-admin/internal/util/utilhttp"
@@ -73,7 +72,9 @@ func (x *tokenPersist) RotateAuthToken(forceRotate bool) {
 
 func assetsReqSkipper(c echo.Context) bool {
 	path := c.Request().URL.Path
-	prefixes := []string{consts.PathAuthAdminAssets}
+	prefixes := []string{
+		// consts.PathAuthAdminAssets,
+	}
 	for _, prefix := range prefixes {
 		if strings.HasPrefix(path, prefix) {
 			// Skip the middleware

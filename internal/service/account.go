@@ -25,11 +25,13 @@ const (
 
 // UserAccount Username,Email,NormalizedEmail are uniqueIndex with condition "not empty"
 type UserAccount struct {
-	ID              string `json:"id" gorm:"size:255;primaryKey"`
-	Username        string `json:"username,omitempty" gorm:"size:255;uniqueIndex:,where:username != ''"`
-	Tel             string `json:"tel,omitempty" gorm:"size:255;uniqueIndex:,where:tel != ''"`
-	Email           string `json:"email,omitempty" gorm:"size:255"`                             // use this on emailing and show
-	NormalizedEmail string `json:"-" gorm:"size:255;uniqueIndex:,where:normalized_email != ''"` // use this on search
+	ID       string `json:"id" gorm:"size:255;primaryKey"`
+	Username string `json:"username,omitempty" gorm:"size:255;uniqueIndex:,where:username != ''"`
+	Tel      string `json:"tel,omitempty" gorm:"size:255;uniqueIndex:,where:tel != ''"`
+	// Email           string `json:"email,omitempty" gorm:"size:255"`
+	Email string `json:"-" gorm:"size:255;uniqueIndex:,where:email != ''"` // use this on search
+	// use this on emailing and show
+	// NormalizedEmail string `json:"-" gorm:"size:255;uniqueIndex:,where:normalized_email != ''"` // use this on search
 	// SecurityStamp   string // Key := Base32(Random(32))  HMACSHA1(Key)  Key == VTOQQ2PQKD7A2KTSXU7OFLKUNI7QEZRJ
 	PasswordHash string    `json:"-" gorm:"size:255"`
 	CreatedAt    time.Time `json:"-"`
@@ -54,10 +56,13 @@ func (x *UserAccount) SetTel(value string) {
 }
 
 func (x *UserAccount) SetEmail(value string) {
+
 	valueNorm := utilstring.NormalizeEmail(value)
 
-	x.Email = value
-	x.NormalizedEmail = valueNorm
+	// x.Email = value
+	// x.NormalizedEmail = valueNorm
+
+	x.Email = valueNorm
 
 	// x.Username = valueNorm
 }

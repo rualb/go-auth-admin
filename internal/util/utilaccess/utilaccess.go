@@ -32,16 +32,16 @@ func (x *PermissionsDTO) Fill(userRoles string, prefix string) {
 		if !strings.HasPrefix(r, prefix) {
 			continue
 		}
-		switch {
-		case r == prefix+"access":
+		switch r {
+		case prefix + "access":
 			x.Access = true
-		case r == prefix+"add":
+		case prefix + "add":
 			x.Add = true
-		case r == prefix+"view":
+		case prefix + "view":
 			x.View = true
-		case r == prefix+"edit":
+		case prefix + "edit":
 			x.Edit = true
-		case r == prefix+"delete":
+		case prefix + "delete":
 			x.Delete = true
 		}
 	}
