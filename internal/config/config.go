@@ -347,8 +347,8 @@ func NewAppConfig() *AppConfig {
 			RateLimit: 0,
 			RateBurst: 0,
 
-			Listen: "127.0.0.1:10280",
-			// ListenTLS: "127.0.0.1:10283",
+			Listen: ":10280",
+			// ListenTLS: ":10283",
 
 			CertDir: "",
 
